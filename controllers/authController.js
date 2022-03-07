@@ -76,7 +76,7 @@ exports.signin = async (req, res) => {
             await new ChatModel({ owner: user._id, chats: [] }).save()
         }
 
-        const token = jwt.sign({ user_id: user._id, username: user.username }, 'secret', { expiresIn: '24h' }, process.env.JWT_SECRET);
+        const token = jwt.sign({ user_id: user._id, username: user.username }, process.env.JWT_SECRET);
         res.cookie('token', token, { expire: new Date() + 9878540 });
 
         const { _id } = user;
