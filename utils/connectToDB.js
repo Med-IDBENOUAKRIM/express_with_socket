@@ -6,7 +6,7 @@ exports.connectToDataBase = url => {
         useNewUrlParser: true,
         useUnifiedTopology: true,
         useCreateIndex: true,
-        useFindAndModify: false
+        useFindAndModify: true
     })
     .then(() => console.log('DB is Connected'))
     .catch(() => console.log('DB is NOT Connected'))

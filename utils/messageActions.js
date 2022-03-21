@@ -1,8 +1,10 @@
 const ChatModel = require('../models/ChatModel');
+const UserModel = require('../models/UserModel');
 
 exports.getMessages = async (user_id, messageWith) => {
     try {
-        const user = await ChatModel.findOne({ owner: user_id });
+        const user = await ChatModel.findOne({ owner: user_id })
+        .populate('chats.messageWith');
         const chat = user.chats.find(chat => chat.messageWith._id.toString() === messageWith);
 
         if (!chat) {
@@ -36,7 +38,7 @@ exports.sendNewMessage = async (user_id, toHim, msg) => {
             lastChatForSender.messages.push(new_msg)
             await sender.save()
         } else {
-            const newChat = { messageWith: toHim, message: [new_msg] }
+            const newChat = { messageWith: toHim, messages: [new_msg] }
             sender.chats.unshift(newChat)
             await sender.save()
         }
@@ -48,7 +50,7 @@ exports.sendNewMessage = async (user_id, toHim, msg) => {
             lastChatForReceiver.messages.push(new_msg)
             await receiver.save()
         } else {
-            const newChat = { messageWith: user_id, message: [new_msg] }
+            const newChat = { messageWith: user_id, messages: [new_msg] }
             receiver.chats.unshift(newChat)
             await receiver.save()
         }
@@ -58,5 +60,18 @@ exports.sendNewMessage = async (user_id, toHim, msg) => {
     } catch (error) {
         console.log(error)
         return { error }
+    }
+}
+
+exports.setMsgToRead = async (user_id) => {
+    try {
+        const user = await UserModel.findById(user_id);
+        if (!user.unreadMessage) {
+            user.unreadMessage = true;
+            await user.save();
+        }
+        return;
+    } catch (error) {
+        console.error(error);
     }
 }
